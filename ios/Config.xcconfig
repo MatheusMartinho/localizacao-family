@@ -1,0 +1,13 @@
+// Configuração do backend, versionada.
+//
+// Os valores padrão são vazios de propósito: assim quem clona o repositório
+// compila e roda em modo demonstração, sem precisar de backend nenhum.
+//
+// Para conectar seu Supabase, copie `Secrets.example.xcconfig` para
+// `Secrets.xcconfig` (ignorado pelo git) e preencha. O `#include?` com
+// interrogação é opcional — sem o arquivo, o build passa igual.
+
+SUPABASE_HOST =
+SUPABASE_ANON_KEY =
+
+#include? "Secrets.xcconfig"

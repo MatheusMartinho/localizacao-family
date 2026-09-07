@@ -1,0 +1,15 @@
+# Xcode / XcodeGen
+# O .xcodeproj é gerado a partir de project.yml: `xcodegen generate`.
+ios/build/
+ios/Familia.xcodeproj/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# Credenciais do Supabase — use o Secrets.example.xcconfig como modelo.
+ios/Secrets.xcconfig

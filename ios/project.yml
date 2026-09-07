@@ -1,0 +1,143 @@
+name: Familia
+options:
+  bundleIdPrefix: com.matheus.familia
+  deploymentTarget:
+    iOS: "26.0"
+    watchOS: "26.0"
+  createIntermediateGroups: true
+
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift
+    from: 2.0.0
+
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    MARKETING_VERSION: "1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+
+targets:
+  Familia:
+    type: application
+    platform: iOS
+    # Config.xcconfig é versionado com valores vazios e inclui o Secrets.xcconfig
+    # (ignorado pelo git) se ele existir. Sem o Secrets, o build passa e o app
+    # cai no modo demonstração.
+    configFiles:
+      Debug: Config.xcconfig
+      Release: Config.xcconfig
+    sources:
+      - path: Familia/Sources
+      - path: Familia/Assets.xcassets
+      # Texturas do globo (NASA Blue Marble) copiadas para o bundle.
+      - path: Familia/Resources
+        buildPhase: resources
+      - path: Shared
+      - path: ActivityShared
+    dependencies:
+      - package: Supabase
+        product: Supabase
+      - target: FamiliaWidgets
+      # O watch app compila no scheme FamiliaWatch. Para embutir no app do
+      # iPhone (distribuição), instale o runtime de watchOS no Xcode e
+      # descomente a linha abaixo:
+      # - target: FamiliaWatch
+    info:
+      path: Familia/Info.plist
+      properties:
+        CFBundleDisplayName: Família
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+        UIBackgroundModes:
+          - location
+        NSSupportsLiveActivities: true
+        NSSupportsLiveActivitiesFrequentUpdates: true
+        NSLocationWhenInUseUsageDescription: "O Família usa sua localização para mostrar onde você está no mapa da sua família, em tempo real."
+        NSLocationAlwaysAndWhenInUseUsageDescription: "Permita o acesso contínuo para que sua família veja onde você está mesmo com o app fechado. Você pode pausar o compartilhamento a qualquer momento."
+        NSMotionUsageDescription: "O Família usa os dados de movimento para saber quando você está se deslocando ou parado, economizando bateria."
+        ITSAppUsesNonExemptEncryption: false
+        # Vêm do Secrets.xcconfig; vazios, o app roda em modo demonstração.
+        SupabaseHost: "$(SUPABASE_HOST)"
+        SupabaseAnonKey: "$(SUPABASE_ANON_KEY)"
+    entitlements:
+      path: Familia/Familia.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.matheus.familia
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.matheus.familia
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_UIUserInterfaceStyle: ""
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+
+  FamiliaWidgets:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: FamiliaWidgets/Sources
+      - path: ActivityShared
+      - path: Shared/Theme.swift
+    info:
+      path: FamiliaWidgets/Info.plist
+      properties:
+        CFBundleDisplayName: Família Widgets
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.widgetkit-extension
+    entitlements:
+      path: FamiliaWidgets/FamiliaWidgets.entitlements
+      properties:
+        com.apple.security.application-groups:
+          - group.com.matheus.familia
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.matheus.familia.widgets
+        TARGETED_DEVICE_FAMILY: "1"
+        SKIP_INSTALL: true
+
+  FamiliaWatch:
+    type: application
+    platform: watchOS
+    sources:
+      - path: FamiliaWatch/Sources
+      - path: Shared
+    dependencies:
+      - package: Supabase
+        product: Supabase
+    info:
+      path: FamiliaWatch/Info.plist
+      properties:
+        CFBundleDisplayName: Família
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        WKApplication: true
+        WKCompanionAppBundleIdentifier: com.matheus.familia
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.matheus.familia.watchkitapp
+        TARGETED_DEVICE_FAMILY: "4"
+        SDKROOT: watchos
+
+schemes:
+  Familia:
+    build:
+      targets:
+        Familia: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+  FamiliaWatch:
+    build:
+      targets:
+        FamiliaWatch: all
+    run:
+      config: Debug
