@@ -263,6 +263,18 @@ final class SupabaseFamilyStore: FamilyStore {
         phase = .noFamily
     }
 
+    /// Apagar um usuário do Auth exige a chave `service_role`, que ignora o RLS
+    /// e por isso jamais pode estar dentro do app. Quem apaga é a Edge Function
+    /// `delete-account`, que descobre de quem é a conta pelo próprio JWT — não
+    /// existe parâmetro dizendo "qual usuário", então não dá para pedir a
+    /// exclusão de outra pessoa.
+    func deleteAccount() async throws {
+        guard myID != nil else { return }
+        try await client.functions.invoke("delete-account")
+        // A sessão local não vale mais nada: limpa tudo e volta para o início.
+        await signOut()
+    }
+
     func updateProfile(name: String, emoji: String) async throws {
         guard let myID else { return }
         try await client.from("profiles")

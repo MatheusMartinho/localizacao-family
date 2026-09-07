@@ -12,6 +12,8 @@ struct SettingsView: View {
     @State private var confirmLeave = false
     @State private var pickedPhoto: PhotosPickerItem?
     @State private var savingPhoto = false
+    @State private var confirmDelete = false
+    @State private var deletingAccount = false
 
     private var store: any FamilyStore { model.store }
 
@@ -22,6 +24,7 @@ struct SettingsView: View {
                 placesSection
                 familySection
                 privacySection
+                accountSection
                 if store.isDemo { demoSection }
             }
             .navigationTitle("Ajustes")
@@ -376,6 +379,45 @@ struct SettingsView: View {
                                       height: image.size.height * side / crop))
             }
             .jpegData(compressionQuality: 0.75)
+    }
+
+    // MARK: Conta
+
+    /// Exclusão de conta, exigida pela App Store (diretriz 5.1.1(v)) e devida
+    /// de qualquer forma num app que guarda onde as pessoas estiveram.
+    ///
+    /// Fica numa seção própria, e não escondida dentro de "Família": sair da
+    /// família e apagar a conta são coisas muito diferentes, e a primeira
+    /// estava logo acima. O texto do alerta lista o que some, porque não tem
+    /// volta.
+    private var accountSection: some View {
+        Section {
+            Button("Apagar minha conta", role: .destructive) { confirmDelete = true }
+                .disabled(deletingAccount)
+        } header: {
+            Text("Conta")
+        } footer: {
+            Text("Apagar a conta remove você do app e do servidor. Sair da família, acima, mantém sua conta.")
+        }
+        .alert("Apagar sua conta?", isPresented: $confirmDelete) {
+            Button("Cancelar", role: .cancel) {}
+            Button("Apagar", role: .destructive) { deleteAccount() }
+        } message: {
+            Text("Some para sempre: seu perfil, sua localização atual, o histórico de onde você esteve, seus avisos e sua participação nas famílias. Não dá para desfazer.")
+        }
+    }
+
+    private func deleteAccount() {
+        deletingAccount = true
+        Task {
+            defer { deletingAccount = false }
+            do {
+                try await store.deleteAccount()
+                dismiss()
+            } catch {
+                store.errorMessage = "Não foi possível apagar a conta: \(error.localizedDescription)"
+            }
+        }
     }
 
     // MARK: Demo

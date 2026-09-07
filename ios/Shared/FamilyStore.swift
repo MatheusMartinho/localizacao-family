@@ -42,6 +42,10 @@ protocol FamilyStore: AnyObject, Observable {
     func leaveFamily() async throws
     func updateProfile(name: String, emoji: String) async throws
 
+    /// Apaga a conta de vez: usuário, perfil, localização, histórico e tudo
+    /// mais que dependa dela. Exigido pela App Store (diretriz 5.1.1(v)).
+    func deleteAccount() async throws
+
     /// Publica a própria posição (chamado pelo LocationEngine).
     func publishOwnLocation(_ snapshot: OwnLocationSnapshot) async
 

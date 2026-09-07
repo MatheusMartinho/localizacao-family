@@ -326,6 +326,18 @@ final class MockFamilyStore: FamilyStore {
     func joinFamily(code: String) async throws {}
     func leaveFamily() async throws {}
 
+    /// No demo não existe conta para apagar, mas a tela precisa se comportar
+    /// igual: some tudo e volta para o começo.
+    func deleteAccount() async throws {
+        timer?.invalidate()
+        sims = []
+        members = []
+        trails = [:]
+        alerts = []
+        trips = []
+        phase = .signedOut
+    }
+
     func updateProfile(name: String, emoji: String) async throws {
         guard let i = sims.firstIndex(where: { $0.member.isSelf }) else { return }
         sims[i].member.name = name

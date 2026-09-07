@@ -265,6 +265,31 @@ em andamento, chegar bem também encerra a viagem — um botão só. O aviso usa
 tabela `alerts` com `kind = 'checkin'` e é encerrado pelo próprio remetente, para
 os aparelhos não disputarem o mesmo `update`.
 
+## Apagar a conta
+
+A App Store exige (diretriz 5.1.1(v)) que um app que cria conta permita apagá-la
+por dentro do próprio app. Fica em **Ajustes → Conta → Apagar minha conta**, em
+seção separada de "Sair da família", porque são coisas diferentes: sair da
+família mantém a conta.
+
+Apagar um usuário do Auth exige a chave `service_role`, que ignora o RLS e por
+isso nunca pode estar dentro do app. Quem apaga é a Edge Function
+`delete-account` (`backend/supabase/functions/`): ela descobre de quem é a conta
+**pelo próprio JWT** de quem chamou — não existe parâmetro "qual usuário", então
+não há como pedir a exclusão de outra pessoa. Sem token, 401.
+
+Para implantar: **Edge Functions → Deploy a new function → Via Editor**, cole o
+`index.ts` e nomeie `delete-account`. As variáveis `SUPABASE_URL`,
+`SUPABASE_ANON_KEY` e `SUPABASE_SERVICE_ROLE_KEY` já vêm preenchidas pelo
+Supabase.
+
+A migração `0008` é o que faz a exclusão **funcionar**: quatro chaves
+estrangeiras travavam o `delete`, a pior sendo `families.created_by`, que era
+`not null` — como toda família tem um criador, nenhum usuário real conseguia ser
+apagado. Agora esses campos viram nulos: a família não morre porque quem a criou
+saiu, e o lugar marcado não some porque quem o marcou saiu. Uma família que fica
+sem nenhum membro é apagada por trigger, com lugares, viagens e alertas junto.
+
 ## Widget da tela de início
 
 O widget (tamanhos pequeno e médio) mostra a família sem abrir o app: quem está
