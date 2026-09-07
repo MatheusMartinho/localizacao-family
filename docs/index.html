@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cheguei Bem — Privacidade e suporte</title>
+<style>
+  :root {
+    --tinta: #101210;
+    --tinta-suave: #4a4d47;
+    --papel: #f4f5f2;
+    --verde: #4c5e18;
+    --linha: #dcdfd6;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 48px 24px 96px;
+    background: var(--papel);
+    color: var(--tinta);
+    font: 17px/1.65 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  }
+  main { max-width: 44rem; margin: 0 auto; }
+  h1 { font-size: 2.1rem; line-height: 1.15; margin: 0 0 .3em; letter-spacing: -.02em; }
+  h2 {
+    font-size: 1.25rem; margin: 2.4em 0 .6em; padding-top: 1.6em;
+    border-top: 1px solid var(--linha); letter-spacing: -.01em;
+  }
+  h3 { font-size: 1rem; margin: 1.8em 0 .4em; }
+  p, li { color: var(--tinta-suave); }
+  li { margin-bottom: .4em; }
+  strong { color: var(--tinta); }
+  a { color: var(--verde); }
+  .sub { font-size: 1.1rem; color: var(--tinta-suave); margin: 0 0 2em; }
+  .data { font-size: .85rem; color: var(--tinta-suave); margin-top: 4em; }
+  code {
+    background: #e7e9e2; padding: .12em .4em; border-radius: 4px;
+    font-size: .88em; color: var(--tinta);
+  }
+  .destaque {
+    background: #fff; border: 1px solid var(--linha); border-radius: 14px;
+    padding: 20px 24px; margin: 1.6em 0;
+  }
+  .destaque p:last-child { margin-bottom: 0; }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Cheguei Bem</h1>
+<p class="sub">Um app para a família saber que está todo mundo bem — não para vigiar ninguém.</p>
+
+<div class="destaque">
+  <p><strong>Em uma frase:</strong> sua localização é vista apenas pelas pessoas da
+  sua família dentro do app, fica guardada no banco de dados do próprio app, não
+  é vendida, não é usada para publicidade e não vai para nenhum terceiro. Você
+  pode pausar o compartilhamento quando quiser e apagar sua conta pelo app.</p>
+</div>
+
+<h2 id="privacidade">Política de privacidade</h2>
+
+<h3>Que dados o app coleta</h3>
+<ul>
+  <li><strong>Localização precisa</strong> — coordenadas, velocidade, direção e se
+    você está em movimento ou parado. É a função central do app.</li>
+  <li><strong>Endereço aproximado</strong> — o nome da rua ou do bairro onde você
+    está, obtido a partir das coordenadas.</li>
+  <li><strong>Histórico de localização</strong> — os pontos por onde você passou,
+    para desenhar a trilha do dia.</li>
+  <li><strong>Nível de bateria</strong> do seu aparelho, para a família saber
+    quando o celular está prestes a desligar.</li>
+  <li><strong>E-mail</strong> — usado apenas para autenticar você.</li>
+  <li><strong>Nome de exibição, emoji e foto de perfil</strong>, se você escolher
+    uma da galeria.</li>
+</ul>
+
+<h3>Para que os dados são usados</h3>
+<p>Exclusivamente para o funcionamento do app: mostrar as pessoas da sua família
+no mapa, avisar chegadas e saídas dos lugares que vocês marcaram, o alarme de
+pânico, o aviso de bateria baixa e a linha do tempo do dia.</p>
+<p><strong>Nada é usado para publicidade, rastreamento entre apps, perfilamento
+ou análise de comportamento.</strong> O app não tem anúncios, não usa SDKs de
+publicidade e não faz rastreamento no sentido do App Tracking Transparency.</p>
+
+<h3>Quem vê seus dados</h3>
+<p>Apenas as pessoas que estão na mesma família que você dentro do app — ou seja,
+quem entrou com o código de convite da sua família. Ninguém mais, incluindo
+outras pessoas que usem o app, consegue ver qualquer coisa sua.</p>
+<p>Isso é imposto pelo próprio banco de dados, com regras de segurança em nível de
+linha (Row-Level Security), e não apenas pela tela do app: uma requisição feita
+por alguém de fora da sua família não devolve nenhum dado seu.</p>
+
+<h3>Onde os dados ficam</h3>
+<p>Num projeto <a href="https://supabase.com/privacy">Supabase</a> (infraestrutura
+PostgreSQL), que atua como operador dos dados. Nenhum outro serviço de terceiros
+recebe seus dados. O app usa a Apple para mapas e geocodificação, conforme a
+<a href="https://www.apple.com/legal/privacy/">política da Apple</a>.</p>
+
+<h3>Por quanto tempo</h3>
+<p>A localização atual é sobrescrita a cada atualização. O histórico de trilha
+fica guardado para a linha do tempo do dia. Tudo é apagado quando você apaga a
+conta.</p>
+
+<h3>Seus controles</h3>
+<ul>
+  <li><strong>Pausar o compartilhamento</strong> — em Ajustes. Sua posição para de
+    ser enviada na hora. Sua família é avisada de que você pausou, e o próprio
+    botão diz isso antes de você pausar.</li>
+  <li><strong>Sair da família</strong> — sua família deixa de ver você, e sua
+    conta continua existindo.</li>
+  <li><strong>Apagar a conta</strong> — em Ajustes → Conta. Apaga para sempre seu
+    perfil, sua localização, o histórico, seus avisos e sua participação nas
+    famílias. Não é uma desativação: os dados são removidos do servidor.</li>
+  <li><strong>Revogar a localização</strong> a qualquer momento nos Ajustes do
+    iPhone. O app continua abrindo, apenas sem mostrar onde você está.</li>
+</ul>
+
+<h3>Crianças</h3>
+<p>O app é feito para famílias e pode ser usado por menores com a participação
+dos responsáveis. Cada pessoa instala o app no próprio aparelho e concede a
+permissão de localização por conta própria — não existe forma de adicionar
+alguém ao mapa sem que essa pessoa instale o app e aceite compartilhar.</p>
+
+<h3>Mudanças nesta política</h3>
+<p>Se algo mudar, esta página é atualizada e a data no rodapé muda junto. O
+histórico completo de alterações é público no repositório do projeto.</p>
+
+<h2 id="suporte">Suporte</h2>
+<p>Dúvidas, problemas ou pedidos sobre seus dados (incluindo exclusão):
+escreva para <a href="mailto:SEU-EMAIL@exemplo.com">SEU-EMAIL@exemplo.com</a>.</p>
+<p>O código-fonte do app é aberto e está em
+<a href="https://github.com/MatheusMartinho/localizacao-family">github.com/MatheusMartinho/localizacao-family</a>
+— dá para conferir exatamente o que ele faz com os dados.</p>
+
+<p class="data">Atualizada em 7 de setembro de 2026.</p>
+
+</main>
+</body>
+</html>
