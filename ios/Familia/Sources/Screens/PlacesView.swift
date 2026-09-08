@@ -131,7 +131,7 @@ private struct NewPlaceView: View {
                         Text("Raio: \(Int(radius)) metros")
                             .font(.subheadline.weight(.semibold))
                         Slider(value: $radius, in: 50...1000, step: 10)
-                            .tint(.accentDeep)
+                            .tint(.accentAdaptive)
                         Text("Um raio pequeno demais faz a pessoa \"sair\" do lugar sozinha, porque o GPS oscila alguns metros.")
                             .font(.caption)
                             .foregroundStyle(.secondary)
@@ -140,10 +140,10 @@ private struct NewPlaceView: View {
                     if let here {
                         Map(position: $camera, interactionModes: []) {
                             MapCircle(center: here, radius: radius)
-                                .foregroundStyle(Color.accentDeep.opacity(0.15))
-                                .stroke(Color.accentDeep, lineWidth: 2)
+                                .foregroundStyle(Color.accentAdaptive.opacity(0.15))
+                                .stroke(Color.accentAdaptive, lineWidth: 2)
                             Marker(name.isEmpty ? "Aqui" : name, coordinate: here)
-                                .tint(Color.accentDeep)
+                                .tint(Color.accentAdaptive)
                         }
                         .frame(height: 190)
                         .clipShape(.rect(cornerRadius: 16))

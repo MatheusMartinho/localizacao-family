@@ -171,7 +171,7 @@ struct SettingsView: View {
                     }
                 } icon: {
                     Image(systemName: "house.fill")
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                 }
             }
         }
@@ -194,7 +194,7 @@ struct SettingsView: View {
                         .tracking(2)
                         .lineLimit(1)
                         .minimumScaleFactor(0.7)
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                     ShareLink(item: "Entre na nossa família no app Família! Código: \(family.inviteCode)") {
                         Image(systemName: "square.and.arrow.up")
                     }
@@ -258,7 +258,7 @@ struct SettingsView: View {
                         .foregroundStyle(Color.stoppedGray)
                 }
             }
-            .tint(.accentDeep)
+            .tint(.accentAdaptive)
 
             Menu {
                 Button("Silenciar por 1 hora") { model.snoozeAlerts(hours: 1) }
@@ -275,11 +275,11 @@ struct SettingsView: View {
                             .foregroundStyle(.primary)
                         Text(model.snoozeSummary)
                             .font(.caption)
-                            .foregroundStyle(model.alertsSnoozed ? Color.accentDeep : .secondary)
+                            .foregroundStyle(model.alertsSnoozed ? Color.accentAdaptive : .secondary)
                     }
                 } icon: {
                     Image(systemName: model.alertsSnoozed ? "bell.slash.fill" : "bell.fill")
-                        .foregroundStyle(model.alertsSnoozed ? Color.accentDeep : Color.stoppedGray)
+                        .foregroundStyle(model.alertsSnoozed ? Color.accentAdaptive : Color.stoppedGray)
                 }
             }
 
@@ -296,10 +296,10 @@ struct SettingsView: View {
                     }
                 } icon: {
                     Image(systemName: "lock.iphone")
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                 }
             }
-            .tint(.accentDeep)
+            .tint(.accentAdaptive)
 
             NavigationLink {
                 PlaceAlertsView(model: model)
@@ -314,7 +314,7 @@ struct SettingsView: View {
                     }
                 } icon: {
                     Image(systemName: "figure.walk.arrival")
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                 }
             }
 
@@ -334,10 +334,10 @@ struct SettingsView: View {
                     }
                 } icon: {
                     Image(systemName: "pause.circle.fill")
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                 }
             }
-            .tint(.accentDeep)
+            .tint(.accentAdaptive)
 
             if let pinned = model.store.member(id: model.pinnedMemberID) {
                 HStack {
@@ -429,7 +429,7 @@ struct SettingsView: View {
                     .font(.footnote)
             } icon: {
                 Image(systemName: "sparkles")
-                    .foregroundStyle(Color.accentDeep)
+                    .foregroundStyle(Color.accentAdaptive)
             }
         } footer: {
             Text("Migração do banco em backend/supabase/migrations/0001_init.sql.")

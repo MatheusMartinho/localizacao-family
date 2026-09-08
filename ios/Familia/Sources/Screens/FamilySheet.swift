@@ -95,7 +95,7 @@ struct FamilySheet: View {
     private var demoBanner: some View {
         HStack(spacing: 10) {
             Image(systemName: "sparkles")
-                .foregroundStyle(Color.accentDeep)
+                .foregroundStyle(Color.accentAdaptive)
             Text("Modo demonstração — família fake passeando por São Paulo")
                 .font(.footnote)
                 .foregroundStyle(.secondary)
@@ -143,7 +143,7 @@ struct MemberRow: View {
                             .foregroundStyle(Color.ink)
                             .padding(.horizontal, 7)
                             .padding(.vertical, 2)
-                            .background(Color.accentDeep, in: .capsule)
+                            .background(Color.accentLime, in: .capsule)
                     }
                 }
                 // Pausado, o lugar guardado é o de antes da pausa — mostrá-lo
@@ -157,7 +157,7 @@ struct MemberRow: View {
                 if let companionsText {
                     Label(companionsText, systemImage: "person.2.fill")
                         .font(.caption.weight(.semibold))
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                         .lineLimit(1)
                 }
                 HStack(spacing: 6) {
@@ -185,7 +185,7 @@ struct MemberRow: View {
             if member.isInVehicle {
                 Image(systemName: "car.fill")
                     .font(.system(size: 15, weight: .semibold))
-                    .foregroundStyle(Color.accentDeep)
+                    .foregroundStyle(Color.accentAdaptive)
             }
 
             VStack(spacing: 2) {

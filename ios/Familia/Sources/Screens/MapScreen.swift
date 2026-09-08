@@ -86,12 +86,12 @@ struct MapScreen: View {
             // Lugares marcados: círculo suave com o nome no centro.
             ForEach(store.places) { place in
                 MapCircle(center: place.coordinate, radius: place.radiusM)
-                    .foregroundStyle(Color.accentDeep.opacity(0.10))
-                    .stroke(Color.accentDeep.opacity(0.45), lineWidth: 1.5)
+                    .foregroundStyle(Color.accentAdaptive.opacity(0.10))
+                    .stroke(Color.accentAdaptive.opacity(0.45), lineWidth: 1.5)
                 Annotation(place.name, coordinate: place.coordinate) {
                     Text(place.label)
                         .font(.caption2.weight(.semibold))
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 4)
                         .background(.regularMaterial, in: .capsule)
@@ -108,7 +108,7 @@ struct MapScreen: View {
                let trail = store.trails[selected.id], trail.count > 1 {
                 MapPolyline(coordinates: trail.map(\.coordinate))
                     .stroke(
-                        Color.accentDeep.opacity(0.9),
+                        Color.accentAdaptive.opacity(0.9),
                         style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
                     )
             }
@@ -343,7 +343,7 @@ struct MapScreen: View {
             } label: {
                 HStack(spacing: 8) {
                     Image(systemName: "globe.americas.fill")
-                        .foregroundStyle(Color.accentDeep)
+                        .foregroundStyle(Color.accentAdaptive)
                     Text(FamilyMember.format(meters: GlobeMath.distanceMeters(me, far)))
                         .fontWeight(.semibold)
                     Text("· \(far.name) no globo")
@@ -406,7 +406,7 @@ struct MapScreen: View {
                 barButton("globe.americas.fill", label: "Globo 3D") {
                     model.openGlobe()
                 }
-                .tint(model.farAwayMember != nil ? Color.accentDeep : nil)
+                .tint(model.farAwayMember != nil ? Color.accentAdaptive : nil)
             }
         }
         // Logo acima do sheet da família (detent mínimo de 74pt).
@@ -477,7 +477,7 @@ struct MemberPinView: View {
                         .fill(Color.dangerRed.opacity(0.22))
                         .frame(width: 66, height: 66)
                 } else if member.isMoving && !isPaused {
-                    PulseRing(color: .accentDeep)
+                    PulseRing(color: .accentAdaptive)
                 }
 
                 AvatarView(member: member, size: 46,

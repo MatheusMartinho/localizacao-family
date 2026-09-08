@@ -11,9 +11,10 @@ struct FamiliaApp: App {
     var body: some Scene {
         WindowGroup {
             RootView(model: model)
-                // Tint padrão pensado para fundo claro (mapa, listas). As
-                // telas escuras pedem `.tint(.accentLime)` explicitamente.
-                .tint(.accentDeep)
+                // Verde que acompanha o modo do sistema: oliva no claro, limão
+                // no escuro. As telas que são escuras *sempre* — onboarding,
+                // globo, Live Activity — continuam pedindo `.accentLime`.
+                .tint(.accentAdaptive)
         }
     }
 }

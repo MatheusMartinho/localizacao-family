@@ -47,7 +47,7 @@ struct DayTimelineView: View {
             // Trilho vertical com o marcador, para dar cara de linha do tempo.
             VStack(spacing: 0) {
                 Circle()
-                    .fill(segment.place == nil ? Color.stoppedGray : Color.accentDeep)
+                    .fill(segment.place == nil ? Color.stoppedGray : Color.accentAdaptive)
                     .frame(width: 10, height: 10)
                 Rectangle()
                     .fill(Color.stoppedGray.opacity(0.3))

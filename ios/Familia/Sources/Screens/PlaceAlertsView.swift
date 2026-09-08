@@ -58,7 +58,7 @@ struct PlaceAlertsView: View {
                 )) {
                     Label("Receber avisos", systemImage: "bell.fill")
                 }
-                .tint(.accentDeep)
+                .tint(.accentAdaptive)
             } footer: {
                 Text("Desligar aqui silencia os avisos de chegada e saída — e também os de bateria acabando e de viagem — sem perder suas escolhas abaixo.")
             }
@@ -102,7 +102,7 @@ struct PlaceAlertsView: View {
                 Text(resumo)
                     .font(.caption)
                     .foregroundStyle(model.hasAnyPlaceAlert(for: member.id)
-                                     ? Color.accentDeep : .secondary)
+                                     ? Color.accentAdaptive : .secondary)
                     .lineLimit(1)
             }
         }
@@ -157,7 +157,7 @@ struct MemberPlaceAlertsView: View {
                             HStack(spacing: 6) {
                                 Text(override?.label ?? "Igual ao padrão")
                                     .font(.subheadline)
-                                    .foregroundStyle(override == nil ? .secondary : Color.accentDeep)
+                                    .foregroundStyle(override == nil ? .secondary : Color.accentAdaptive)
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.caption2)
                                     .foregroundStyle(.secondary)

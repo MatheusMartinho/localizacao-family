@@ -30,7 +30,7 @@ struct MemberDetailView: View {
                 // Cabeçalho: avatar grande com anel e pulso.
                 ZStack {
                     if member.isMoving && !member.sharingPaused {
-                        PulseRing(color: .accentDeep).scaleEffect(1.8)
+                        PulseRing(color: .accentAdaptive).scaleEffect(1.8)
                     }
                     AvatarView(member: member, size: 92, ring: 4,
                                ringOverride: member.sharingPaused ? .stoppedGray : nil)
@@ -73,17 +73,17 @@ struct MemberDetailView: View {
                             factCard(title: "No carro",
                                      value: member.speedText,
                                      symbol: "car.fill",
-                                     tint: .accentDeep)
+                                     tint: .accentAdaptive)
                         } else if let me = store.selfMember, !member.isSelf {
                             factCard(title: "Distância",
                                      value: member.distance(to: me),
                                      symbol: "point.topleft.down.to.point.bottomright.curvepath",
-                                     tint: .accentDeep)
+                                     tint: .accentAdaptive)
                         } else {
                             factCard(title: "Velocidade",
                                      value: member.speedText,
                                      symbol: "gauge.with.needle",
-                                     tint: .accentDeep)
+                                     tint: .accentAdaptive)
                         }
                     }
                 }
@@ -123,7 +123,7 @@ struct MemberDetailView: View {
                     HStack(spacing: 14) {
                         Image(systemName: "clock.arrow.trianglehead.counterclockwise.rotate.90")
                             .font(.system(size: 19, weight: .semibold))
-                            .foregroundStyle(Color.accentDeep)
+                            .foregroundStyle(Color.accentAdaptive)
                             .frame(width: 44, height: 44)
                             .background(Color.accentOlive.opacity(0.2), in: .circle)
                         VStack(alignment: .leading, spacing: 2) {
@@ -222,7 +222,7 @@ struct MemberDetailView: View {
             Spacer(minLength: 0)
         }
         .padding(16)
-        .glassEffect(.regular.tint(.accentDeep.opacity(0.12)), in: .rect(cornerRadius: 22))
+        .glassEffect(.regular.tint(.accentAdaptive.opacity(0.12)), in: .rect(cornerRadius: 22))
     }
 
     /// Pausa: aqui a última posição conhecida é dita como tal, com o horário —
@@ -284,11 +284,11 @@ struct MemberDetailView: View {
                 Spacer(minLength: 6)
                 Image(systemName: pinned ? "checkmark.circle.fill" : "circle")
                     .font(.system(size: 24))
-                    .foregroundStyle(pinned ? Color.accentDeep : Color.stoppedGray.opacity(0.5))
+                    .foregroundStyle(pinned ? Color.accentAdaptive : Color.stoppedGray.opacity(0.5))
                     .symbolEffect(.bounce, value: pinned)
             }
             .padding(16)
-            .glassEffect(pinned ? .regular.tint(.accentDeep.opacity(0.16)) : .regular,
+            .glassEffect(pinned ? .regular.tint(.accentAdaptive.opacity(0.16)) : .regular,
                          in: .rect(cornerRadius: 22))
         }
         .buttonStyle(.plain)

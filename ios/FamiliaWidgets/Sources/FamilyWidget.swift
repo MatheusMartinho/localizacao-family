@@ -125,7 +125,7 @@ struct FamilyWidgetView: View {
                 Circle()
                     .strokeBorder(member.isEmergency ? Color.dangerRed
                                   : member.isPaused == true ? Color.stoppedGray.opacity(0.5)
-                                  : member.isMoving ? Color.accentDeep : Color.stoppedGray,
+                                  : member.isMoving ? Color.accentAdaptive : Color.stoppedGray,
                                   lineWidth: 2)
             }
             .frame(width: family == .systemSmall ? 22 : 26,
@@ -154,7 +154,7 @@ struct FamilyWidgetView: View {
             if member.isInVehicle {
                 Image(systemName: "car.fill")
                     .font(.system(size: 10, weight: .semibold))
-                    .foregroundStyle(Color.accentDeep)
+                    .foregroundStyle(Color.accentAdaptive)
             }
             if (1...20).contains(member.batteryPct) {
                 Text("\(member.batteryPct)%")

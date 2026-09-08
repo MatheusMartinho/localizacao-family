@@ -43,7 +43,7 @@ struct TripSection: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "figure.walk.motion")
-                    .foregroundStyle(Color.accentDeep)
+                    .foregroundStyle(Color.accentAdaptive)
                 Text("Avisar que estou a caminho")
                     .fontWeight(.semibold)
                     .foregroundStyle(.primary)
@@ -66,7 +66,7 @@ struct TripSection: View {
         } label: {
             HStack(spacing: 10) {
                 Image(systemName: "checkmark.seal.fill")
-                    .foregroundStyle(Color.accentDeep)
+                    .foregroundStyle(Color.accentAdaptive)
                 Text("Avisar que cheguei bem")
                     .fontWeight(.semibold)
                 Spacer()
@@ -88,7 +88,7 @@ struct TripSection: View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(spacing: 10) {
                 Image(systemName: "figure.walk.motion")
-                    .foregroundStyle(Color.accentDeep)
+                    .foregroundStyle(Color.accentAdaptive)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("A caminho de \(trip.destinationLabel)")
                         .font(.subheadline.weight(.semibold))
@@ -101,7 +101,7 @@ struct TripSection: View {
             HStack(spacing: 10) {
                 Button("Cheguei") { model.finishMyTrip(arrived: true) }
                     .buttonStyle(.borderedProminent)
-                    .tint(Color.accentDeep)
+                    .tint(Color.accentAdaptive)
                 Button("Cancelar") { model.finishMyTrip(arrived: false) }
                     .buttonStyle(.bordered)
                     .tint(Color.stoppedGray)
@@ -109,7 +109,7 @@ struct TripSection: View {
             .font(.subheadline)
         }
         .padding(14)
-        .glassEffect(.regular.tint(.accentDeep.opacity(0.12)), in: .rect(cornerRadius: 20))
+        .glassEffect(.regular.tint(.accentAdaptive.opacity(0.12)), in: .rect(cornerRadius: 20))
     }
 
     /// Sem estado de "atrasado": o cartão diz para onde a pessoa vai e desde
