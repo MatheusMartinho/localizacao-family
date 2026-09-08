@@ -48,6 +48,39 @@ final class AlertCenter: NSObject, UNUserNotificationCenterDelegate {
             // Vibra além do som: alerta de emergência tem que ser sentido.
             let generator = UINotificationFeedbackGenerator()
             generator.notificationOccurred(.error)
+            repeatSOS(alert)
+        }
+    }
+
+    /// Quantas vezes o alarme se repete, e de quanto em quanto tempo.
+    /// Cobre cerca de um minuto e meio — tempo de tirar o celular do bolso.
+    private static let sosRepeats = 15
+    private static let sosInterval: TimeInterval = 6
+
+    /// Um toque só se perde: o celular está no bolso, de cabeça para baixo na
+    /// mesa, ou a pessoa estava falando. Um alarme de pânico precisa insistir
+    /// até ser visto.
+    ///
+    /// A repetição é feita com notificações agendadas porque é o único jeito de
+    /// continuar soando com o app fechado — um app suspenso não toca áudio. Elas
+    /// são canceladas assim que o alerta é atendido ou encerrado.
+    ///
+    /// Limite honesto: isto **não** atravessa o modo silencioso. Só as Critical
+    /// Alerts da Apple fazem isso, e elas exigem um entitlement concedido caso a
+    /// caso mediante formulário — vale pedir para um app de emergência familiar.
+    private func repeatSOS(_ alert: FamilyAlert) {
+        for i in 1...Self.sosRepeats {
+            let content = UNMutableNotificationContent()
+            content.title = alert.title
+            content.body = alert.body
+            content.sound = .defaultCritical
+            content.interruptionLevel = .timeSensitive
+            content.userInfo = ["alertID": alert.id]
+            content.threadIdentifier = alert.kind.rawValue
+            let trigger = UNTimeIntervalNotificationTrigger(
+                timeInterval: Double(i) * Self.sosInterval, repeats: false)
+            center.add(UNNotificationRequest(identifier: "\(alert.id)-repeat-\(i)",
+                                             content: content, trigger: trigger))
         }
     }
 
@@ -153,10 +186,13 @@ final class AlertCenter: NSObject, UNUserNotificationCenterDelegate {
                                          content: content, trigger: nil))
     }
 
-    /// Remove a notificação de um alerta já resolvido.
+    /// Remove a notificação de um alerta já resolvido — inclusive as repetições
+    /// do alarme que ainda não tocaram, senão ele continuaria soando depois de
+    /// alguém já ter atendido.
     func clear(alertID: String) {
-        center.removeDeliveredNotifications(withIdentifiers: [alertID])
-        center.removePendingNotificationRequests(withIdentifiers: [alertID])
+        let ids = [alertID] + (1...Self.sosRepeats).map { "\(alertID)-repeat-\($0)" }
+        center.removeDeliveredNotifications(withIdentifiers: ids)
+        center.removePendingNotificationRequests(withIdentifiers: ids)
     }
 
     // MARK: - UNUserNotificationCenterDelegate

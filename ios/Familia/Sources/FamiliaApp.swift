@@ -730,7 +730,13 @@ struct RootView: View {
         }
         .onAppear { model.startIfNeeded() }
         .onChange(of: scenePhase) { _, phase in
-            if phase == .active { Task { await model.store.refresh() } }
+            guard phase == .active else { return }
+            Task { await model.store.refresh() }
+            // Puxa do servidor **e** empurra o próprio estado: em segundo plano
+            // o app fica suspenso, então a bateria e o horário da última
+            // posição podem estar congelados desde a última vez que ele esteve
+            // aberto. Abrir o app tem que valer como atualizar.
+            model.locationEngine.refreshNow()
         }
     }
 

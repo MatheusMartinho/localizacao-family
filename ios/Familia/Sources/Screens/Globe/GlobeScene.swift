@@ -67,6 +67,14 @@ final class GlobeScene {
             sky.color = .init(tint: .white, texture: .init(stars))
             sky.faceCulling = .front
             let skyDome = ModelEntity(mesh: .generateSphere(radius: 60), materials: [sky])
+            // A faixa da galáxia fica no equador da textura — que é exatamente
+            // onde o globo está, então ela ficava escondida atrás da Terra e o
+            // céu parecia só um chuvisco de estrelas. Inclinada, ela cruza a
+            // tela na diagonal e passa por trás do planeta, que é a foto que
+            // todo mundo tem na cabeça. O giro em Y traz o núcleo, mais quente
+            // e mais denso, para o canto de cima.
+            skyDome.orientation = simd_quatf(angle: .pi * 0.30, axis: [0, 0, 1])
+                * simd_quatf(angle: .pi * 0.72, axis: [0, 1, 0])
             content.add(skyDome)
         }
 

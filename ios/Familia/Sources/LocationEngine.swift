@@ -217,6 +217,13 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
     /// velocidade antiga seria inventar movimento. E o estado movendo/parado
     /// fica como está — quem está mesmo andando gera pontos de GPS, e aí este
     /// batimento nem entra em cena.
+    /// Reenvia agora, sem esperar o batimento nem o GPS. Chamado quando o app
+    /// volta para a frente: o iOS suspende o processo em segundo plano, e um
+    /// processo suspenso não roda timer nenhum — então o dado podia estar
+    /// parado desde a última vez que o app esteve aberto.
+    @MainActor
+    func refreshNow() { republish() }
+
     @MainActor
     private func republish() {
         guard let location = lastLocation else { return }
