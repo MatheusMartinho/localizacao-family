@@ -104,25 +104,32 @@ struct MapScreen: View {
             }
 
             // Trilha do membro selecionado.
-            if let selected = model.selectedMember,
+            //
+            // Pontilhada, fina e translúcida de propósito: o que temos são
+            // pontos de GPS esparsos, e ligá-los com linha cheia desenhava
+            // retas atravessando quarteirões, com toda a cara de uma rota
+            // errada. Pontilhado se lê como "por aqui, mais ou menos", que é a
+            // verdade. Some enquanto há rota, para não disputar com ela.
+            if model.route == nil, let selected = model.selectedMember,
                let trail = store.trails[selected.id], trail.count > 1 {
                 MapPolyline(coordinates: trail.map(\.coordinate))
                     .stroke(
-                        Color.accentAdaptive.opacity(0.9),
-                        style: StrokeStyle(lineWidth: 4, lineCap: .round, lineJoin: .round)
+                        Color.accentAdaptive.opacity(0.5),
+                        style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round,
+                                           dash: [2, 7])
                     )
             }
 
-            // Rota traçada até alguém. Duas linhas: uma escura por baixo, que
-            // separa a rota do mapa em qualquer cor de fundo, e a verde por
-            // cima. É como os apps de navegação desenham, e por bom motivo.
+            // Rota: contorno escuro por baixo, faixa clara por cima. É como
+            // todo app de navegação desenha, e por bom motivo — a faixa se
+            // separa do mapa em qualquer cor de fundo.
             if let route = model.route {
                 MapPolyline(route.polyline)
-                    .stroke(Color.ink.opacity(0.55),
-                            style: StrokeStyle(lineWidth: 11, lineCap: .round, lineJoin: .round))
+                    .stroke(Color.ink.opacity(0.85),
+                            style: StrokeStyle(lineWidth: 15, lineCap: .round, lineJoin: .round))
                 MapPolyline(route.polyline)
-                    .stroke(Color.accentLime,
-                            style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
+                    .stroke(Color.routeBlue,
+                            style: StrokeStyle(lineWidth: 10, lineCap: .round, lineJoin: .round))
             }
 
             ForEach(pinItems) { item in
@@ -193,6 +200,17 @@ struct MapScreen: View {
         }
         .animation(.spring(duration: 0.4), value: model.routeMemberID)
         .onAppear { frameFamilyIfNeeded() }
+        // O erro só tinha alerta dentro dos Ajustes. No mapa — onde a rota é
+        // traçada e a posição é publicada — ele era gravado e nunca mostrado:
+        // a rota simplesmente não aparecia, sem uma palavra.
+        .alert("Ops", isPresented: Binding(
+            get: { store.errorMessage != nil },
+            set: { if !$0 { store.errorMessage = nil } }
+        )) {
+            Button("OK", role: .cancel) { store.errorMessage = nil }
+        } message: {
+            Text(store.errorMessage ?? "")
+        }
     }
 
     // MARK: - Barra da família
@@ -298,18 +316,17 @@ struct MapScreen: View {
                 VStack(alignment: .leading, spacing: 1) {
                     Text("Até \(alvo.name)")
                         .font(.footnote.weight(.semibold))
-                    if let route = model.route {
-                        Text("\(FamilyMember.format(meters: route.distance)) · \(Self.duracao(route.expectedTravelTime))")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    } else {
-                        Text("Traçando…")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text(model.route.map { FamilyMember.format(meters: $0.distance) } ?? "Traçando…")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
                 Spacer(minLength: 6)
-                if model.route != nil {
+                if let route = model.route {
+                    // O tempo é o número que a pessoa procura primeiro.
+                    Text(Self.duracao(route.expectedTravelTime))
+                        .font(.system(.title3, design: .rounded).weight(.heavy))
+                        .monospacedDigit()
+                        .foregroundStyle(Color.routeBlue)
                     Button("Guiar") { model.openRouteInMaps() }
                         .font(.caption.weight(.bold))
                         .buttonStyle(.glassProminent)

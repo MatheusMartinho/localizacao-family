@@ -47,6 +47,10 @@ extension Color {
     static let paperDark = Color(red: 0x1A / 255, green: 0x1C / 255, blue: 0x19 / 255)
     /// Cinza-azulado: status "parado".
     static let stoppedGray = Color(red: 0x5C / 255, green: 0x62 / 255, blue: 0x75 / 255)
+    /// Azul de rota. Deliberadamente fora da paleta da marca: rota tem que se
+    /// distinguir da trilha e dos anéis dos avatares, todos verdes, e o azul
+    /// é a convenção que todo mundo já lê como "caminho a seguir".
+    static let routeBlue = Color(red: 0x1E / 255, green: 0x8B / 255, blue: 0xFF / 255)
     /// Bateria baixa, SOS.
     static let dangerRed = Color(red: 0xD9 / 255, green: 0x2B / 255, blue: 0x1F / 255)
 
