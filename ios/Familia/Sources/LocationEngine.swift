@@ -53,6 +53,18 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
     /// evita repetir a chamada a cada mudança de estado.
     private var askedForAlways = false
 
+    /// O app não consegue publicar posição nenhuma neste estado.
+    var isBlocked: Bool {
+        switch authorizationStatus {
+        case .notDetermined, .denied, .restricted: true
+        default: false
+        }
+    }
+
+    /// Funciona com o app aberto, mas não em segundo plano — que é metade da
+    /// razão de existir do app.
+    var isForegroundOnly: Bool { authorizationStatus == .authorizedWhenInUse }
+
     func startIfAuthorized() {
         switch manager.authorizationStatus {
         case .authorizedWhenInUse, .authorizedAlways:

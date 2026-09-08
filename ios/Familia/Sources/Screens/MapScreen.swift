@@ -1,5 +1,6 @@
 import SwiftUI
 import MapKit
+import UIKit
 
 /// Tela principal: mapa full-bleed com os pins da família e UI de vidro
 /// flutuando por cima.
@@ -150,6 +151,7 @@ struct MapScreen: View {
                     settingsButton
                 }
                 statusPill
+                permissionBanner
                 farAwayBanner
             }
             .padding(.horizontal, 14)
@@ -252,6 +254,80 @@ struct MapScreen: View {
                 span: MKCoordinateSpan(latitudeDelta: span, longitudeDelta: span)
             ))
         }
+    }
+
+    // MARK: - Aviso de permissão
+
+    /// Sem permissão de localização o app não publica nada, e o resultado é a
+    /// pessoa aparecendo "Parou", com 0% de bateria e sem sair do lugar — um
+    /// silêncio que parece defeito. Este aviso diz o que está acontecendo e
+    /// resolve no mesmo toque.
+    @ViewBuilder
+    private var permissionBanner: some View {
+        let status = model.locationEngine.authorizationStatus
+        if status == .notDetermined {
+            permissionCard(
+                symbol: "location.slash.fill",
+                title: "Sua família não vê onde você está",
+                detail: "O app precisa da sua localização.",
+                action: "Permitir"
+            ) {
+                model.locationEngine.requestWhenInUse()
+            }
+        } else if status == .denied || status == .restricted {
+            permissionCard(
+                symbol: "location.slash.fill",
+                title: "Localização desativada",
+                detail: "Ative em Ajustes para sua família te ver.",
+                action: "Ajustes"
+            ) {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+        } else if model.locationEngine.isForegroundOnly {
+            permissionCard(
+                symbol: "exclamationmark.triangle.fill",
+                title: "Só enquanto o app está aberto",
+                detail: "Escolha \"Sempre\" para funcionar de bolso.",
+                action: "Ajustes"
+            ) {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+        }
+    }
+
+    private func permissionCard(symbol: String, title: String, detail: String,
+                                action: String, run: @escaping () -> Void) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: symbol)
+                .font(.system(size: 15, weight: .bold))
+                .foregroundStyle(Color.dangerRed)
+            VStack(alignment: .leading, spacing: 1) {
+                Text(title)
+                    .font(.footnote.weight(.semibold))
+                Text(detail)
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer(minLength: 6)
+            Button(action: run) {
+                Text(action)
+                    .font(.caption.weight(.bold))
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 6)
+            }
+            .buttonStyle(.glassProminent)
+            .tint(.accentLime)
+            .foregroundStyle(Color.ink)
+        }
+        .padding(.leading, 14)
+        .padding(.trailing, 8)
+        .padding(.vertical, 8)
+        .glassEffect(.regular, in: .capsule)
+        .transition(.move(edge: .top).combined(with: .opacity))
     }
 
     // MARK: - Aviso de alguém longe
