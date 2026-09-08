@@ -497,6 +497,65 @@ final class AppModel {
         Task { try? await store.finishTrip(id: trip.id, arrived: arrived) }
     }
 
+    // MARK: - Rota
+
+    /// Rota traçada até alguém, desenhada no próprio mapa.
+    ///
+    /// Antes o botão jogava a pessoa no Apple Maps, e sair do app é sair do
+    /// app: você perde a família de vista para ganhar uma linha. Aqui a linha
+    /// aparece por cima do mesmo mapa, com os pins de todo mundo ainda ali. O
+    /// Mapas continua a um toque de distância, para quem quer navegação
+    /// guiada de verdade — que é coisa que este app não faz nem deveria.
+    var route: MKRoute?
+    var routeMemberID: String?
+    var routeLoading = false
+
+    var routeMember: FamilyMember? { store.member(id: routeMemberID) }
+
+    func drawRoute(to member: FamilyMember) {
+        guard let me = store.selfMember, me.latitude != 0 || me.longitude != 0 else {
+            store.errorMessage = "Ainda não sabemos onde você está para traçar a rota."
+            return
+        }
+        routeMemberID = member.id
+        routeLoading = true
+        showFamilySheet = false
+        select(member)
+
+        Task {
+            defer { routeLoading = false }
+            let request = MKDirections.Request()
+            request.source = MKMapItem(location: CLLocation(latitude: me.latitude,
+                                                            longitude: me.longitude), address: nil)
+            request.destination = MKMapItem(location: CLLocation(latitude: member.latitude,
+                                                                 longitude: member.longitude), address: nil)
+            request.transportType = .automobile
+            guard let resposta = try? await MKDirections(request: request).calculate(),
+                  let primeira = resposta.routes.first else {
+                routeMemberID = nil
+                store.errorMessage = "Não foi possível traçar uma rota até \(member.name)."
+                return
+            }
+            route = primeira
+        }
+    }
+
+    func clearRoute() {
+        route = nil
+        routeMemberID = nil
+    }
+
+    /// Abre a rota no Apple Maps, para navegação guiada.
+    func openRouteInMaps() {
+        guard let member = routeMember else { return }
+        let item = MKMapItem(location: CLLocation(latitude: member.latitude,
+                                                  longitude: member.longitude), address: nil)
+        item.name = member.name
+        item.openInMaps(launchOptions: [
+            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
+        ])
+    }
+
     // MARK: - Alarme de pânico
 
     func triggerSOS() {

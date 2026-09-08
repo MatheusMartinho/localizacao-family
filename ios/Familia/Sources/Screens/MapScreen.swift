@@ -113,6 +113,18 @@ struct MapScreen: View {
                     )
             }
 
+            // Rota traçada até alguém. Duas linhas: uma escura por baixo, que
+            // separa a rota do mapa em qualquer cor de fundo, e a verde por
+            // cima. É como os apps de navegação desenham, e por bom motivo.
+            if let route = model.route {
+                MapPolyline(route.polyline)
+                    .stroke(Color.ink.opacity(0.55),
+                            style: StrokeStyle(lineWidth: 11, lineCap: .round, lineJoin: .round))
+                MapPolyline(route.polyline)
+                    .stroke(Color.accentLime,
+                            style: StrokeStyle(lineWidth: 6, lineCap: .round, lineJoin: .round))
+            }
+
             ForEach(pinItems) { item in
                 Annotation(item.members.first?.name ?? "", coordinate: item.coordinate) {
                     if item.isGroup {
@@ -158,7 +170,12 @@ struct MapScreen: View {
             .padding(.horizontal, 14)
             .padding(.top, 6)
         }
-        .overlay(alignment: .bottom) { actionBar }
+        .overlay(alignment: .bottom) {
+            VStack(spacing: 10) {
+                routePanel
+                actionBar
+            }
+        }
         .sheet(isPresented: $model.showFamilySheet) {
             FamilySheet(model: model, camera: $camera)
         }
@@ -167,6 +184,14 @@ struct MapScreen: View {
         }
         // A primeira posição costuma chegar depois do mapa aparecer.
         .onChange(of: locatedMembers.count) { _, _ in frameFamilyIfNeeded() }
+        // Rota nova: enquadra o caminho inteiro, senão ela nasce fora da tela.
+        .onChange(of: model.route) { _, route in
+            guard let route else { return }
+            withAnimation(.spring(duration: 0.9)) {
+                camera = .rect(route.polyline.boundingMapRect.insetBy(dx: -2500, dy: -2500))
+            }
+        }
+        .animation(.spring(duration: 0.4), value: model.routeMemberID)
         .onAppear { frameFamilyIfNeeded() }
     }
 
@@ -255,6 +280,65 @@ struct MapScreen: View {
                 span: MKCoordinateSpan(latitudeDelta: span, longitudeDelta: span)
             ))
         }
+    }
+
+    // MARK: - Rota
+
+    /// Painel da rota: distância, tempo, e a saída para o Apple Maps.
+    ///
+    /// O app desenha o caminho, mas não faz navegação guiada — nem deveria,
+    /// que é um produto inteiro à parte. Quem vai dirigir toca em "Guiar" e o
+    /// Mapas assume; quem só quer ver onde a pessoa está em relação a você
+    /// fica aqui, com a família toda ainda visível no mesmo mapa.
+    @ViewBuilder
+    private var routePanel: some View {
+        if model.routeLoading || model.route != nil, let alvo = model.routeMember {
+            HStack(spacing: 12) {
+                AvatarView(member: alvo, size: 34, ring: 2)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text("Até \(alvo.name)")
+                        .font(.footnote.weight(.semibold))
+                    if let route = model.route {
+                        Text("\(FamilyMember.format(meters: route.distance)) · \(Self.duracao(route.expectedTravelTime))")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    } else {
+                        Text("Traçando…")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                Spacer(minLength: 6)
+                if model.route != nil {
+                    Button("Guiar") { model.openRouteInMaps() }
+                        .font(.caption.weight(.bold))
+                        .buttonStyle(.glassProminent)
+                        .tint(.accentLime)
+                        .foregroundStyle(Color.ink)
+                }
+                Button {
+                    model.clearRoute()
+                } label: {
+                    Image(systemName: "xmark")
+                        .font(.system(size: 12, weight: .bold))
+                        .frame(width: 30, height: 30)
+                }
+                .buttonStyle(.glass)
+            }
+            .padding(.leading, 12)
+            .padding(.trailing, 8)
+            .padding(.vertical, 8)
+            .glassEffect(.regular, in: .capsule)
+            .padding(.horizontal, 14)
+            .transition(.move(edge: .bottom).combined(with: .opacity))
+        }
+    }
+
+    /// "23 min", "1 h 05".
+    private static func duracao(_ segundos: TimeInterval) -> String {
+        let minutos = max(1, Int(segundos / 60))
+        if minutos < 60 { return "\(minutos) min" }
+        return "\(minutos / 60) h \(String(format: "%02d", minutos % 60))"
     }
 
     // MARK: - Alarme em aberto

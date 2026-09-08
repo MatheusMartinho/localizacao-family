@@ -149,7 +149,7 @@ struct MemberDetailView: View {
                 if !member.isSelf {
                     VStack(spacing: 12) {
                         Button {
-                            openRoute(to: member)
+                            model.drawRoute(to: member)
                         } label: {
                             Label("Traçar rota", systemImage: "arrow.triangle.turn.up.right.diamond.fill")
                                 .font(.headline)
@@ -311,14 +311,4 @@ struct MemberDetailView: View {
         .glassEffect(.regular, in: .rect(cornerRadius: 22))
     }
 
-    private func openRoute(to member: FamilyMember) {
-        // `MKMapItem(placemark:)` foi depreciado no iOS 26.
-        let item = MKMapItem(location: CLLocation(latitude: member.latitude,
-                                                  longitude: member.longitude),
-                             address: nil)
-        item.name = member.name
-        item.openInMaps(launchOptions: [
-            MKLaunchOptionsDirectionsModeKey: MKLaunchOptionsDirectionsModeDriving
-        ])
-    }
 }
