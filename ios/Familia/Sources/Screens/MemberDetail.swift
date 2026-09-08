@@ -206,9 +206,12 @@ struct MemberDetailView: View {
             ? nomes[0]
             : nomes.dropLast().joined(separator: ", ") + " e " + nomes[nomes.count - 1]
         return HStack(spacing: 14) {
-            HStack(spacing: -12) {
+            // Lado a lado, não empilhados: aqui não é um pin de mapa, onde a
+            // sobreposição economiza espaço e se lê como grupo. Num cartão de
+            // texto ela só faz um avatar comer o anel do outro.
+            HStack(spacing: 6) {
                 ForEach(companions.prefix(3)) { companion in
-                    AvatarView(member: companion, size: 34, ring: 2.5)
+                    AvatarView(member: companion, size: 32, ring: 2.5)
                 }
             }
             VStack(alignment: .leading, spacing: 2) {

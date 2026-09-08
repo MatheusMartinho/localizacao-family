@@ -194,8 +194,16 @@ struct MapScreen: View {
         // Rota nova: enquadra o caminho inteiro, senão ela nasce fora da tela.
         .onChange(of: model.route) { _, route in
             guard let route else { return }
+            // Folga maior embaixo: é onde ficam o painel da rota e a barra de
+            // ações, e sem isso o destino nascia escondido atrás deles.
+            let r = route.polyline.boundingMapRect
+            let lados = max(r.width * 0.15, 400)
+            let cima = max(r.height * 0.15, 400)
+            let baixo = max(r.height * 0.55, 1600)
             withAnimation(.spring(duration: 0.9)) {
-                camera = .rect(route.polyline.boundingMapRect.insetBy(dx: -2500, dy: -2500))
+                camera = .rect(MKMapRect(x: r.minX - lados, y: r.minY - cima,
+                                         width: r.width + 2 * lados,
+                                         height: r.height + cima + baixo))
             }
         }
         .animation(.spring(duration: 0.4), value: model.routeMemberID)
@@ -559,8 +567,11 @@ struct MapScreen: View {
                 .tint(model.farAwayMember != nil ? Color.accentAdaptive : nil)
             }
         }
-        // Logo acima do sheet da família (detent mínimo de 74pt).
-        .padding(.bottom, 86)
+        // Acima do sheet da família (detent mínimo de 74pt) — mas só quando
+        // ele está na tela. Com a rota traçada o sheet sai, e manter o espaço
+        // dele empurrava a barra e o painel para cima do mapa sem motivo,
+        // tapando justamente o destino.
+        .padding(.bottom, model.showFamilySheet ? 86 : 18)
     }
 
     private func barButton(_ symbol: String, label: String, action: @escaping () -> Void) -> some View {
