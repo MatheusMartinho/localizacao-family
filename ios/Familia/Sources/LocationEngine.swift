@@ -32,6 +32,10 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
     private var belowSince: Date?
     private var lastGeocode = Date.distantPast
     private var isGeocoding = false
+    /// Menor que os 20 min que fazem uma posição virar "velha", para quem está
+    /// parado não aparecer como sumido.
+    private static let heartbeatInterval: TimeInterval = 5 * 60
+    @ObservationIgnored nonisolated(unsafe) private var heartbeat: Timer?
 
     override init() {
         super.init()
@@ -41,6 +45,7 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
         manager.pausesLocationUpdatesAutomatically = false
         manager.activityType = .other
         UIDevice.current.isBatteryMonitoringEnabled = true
+        observeBattery()
     }
 
     // MARK: - Controle
@@ -81,6 +86,7 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
         }
         manager.startUpdatingLocation()
         manager.startMonitoringSignificantLocationChanges()
+        startHeartbeat()
     }
 
     /// Força uma leitura imediata — usado quando alguém pede "cadê você?".
@@ -91,6 +97,8 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
     func stop() {
         manager.stopUpdatingLocation()
         manager.stopMonitoringSignificantLocationChanges()
+        heartbeat?.invalidate()
+        heartbeat = nil
     }
 
     // MARK: - CLLocationManagerDelegate
@@ -176,20 +184,66 @@ final class LocationEngine: NSObject, CLLocationManagerDelegate {
             }
         }
 
-        let level = UIDevice.current.batteryLevel
-        let battery = level >= 0 ? Int((level * 100).rounded()) : 100
+        onSnapshot?(makeSnapshot(location: location, speed: speed))
+    }
 
-        let snapshot = OwnLocationSnapshot(
+    @MainActor
+    private func makeSnapshot(location: CLLocation, speed: CLLocationSpeed) -> OwnLocationSnapshot {
+        let level = UIDevice.current.batteryLevel
+        return OwnLocationSnapshot(
             latitude: location.coordinate.latitude,
             longitude: location.coordinate.longitude,
             accuracyM: location.horizontalAccuracy >= 0 ? location.horizontalAccuracy : nil,
             speedMps: speed,
             heading: location.course >= 0 ? location.course : nil,
-            batteryPct: battery,
+            batteryPct: level >= 0 ? Int((level * 100).rounded()) : 100,
             isMoving: isMoving,
             stateSince: stateSince,
             placeHint: placeHint
         )
-        onSnapshot?(snapshot)
+    }
+
+    // MARK: - Batimento
+
+    /// Reenvia a última posição conhecida, com bateria e horário frescos.
+    ///
+    /// A posição só era publicada quando o GPS entregava um ponto novo — e com
+    /// o filtro de 10 m um celular parado na mesa não entrega nenhum. O efeito
+    /// era a bateria congelar no valor de quando o app abriu (carregando o
+    /// aparelho, o número não mexia) e a pessoa aparecer "vista há 3 h" sentada
+    /// em casa, que é onde ela mais fica.
+    ///
+    /// A velocidade vai como zero de propósito: sem ponto novo, repetir a
+    /// velocidade antiga seria inventar movimento. E o estado movendo/parado
+    /// fica como está — quem está mesmo andando gera pontos de GPS, e aí este
+    /// batimento nem entra em cena.
+    @MainActor
+    private func republish() {
+        guard let location = lastLocation else { return }
+        onSnapshot?(makeSnapshot(location: location, speed: 0))
+    }
+
+    private func startHeartbeat() {
+        heartbeat?.invalidate()
+        let timer = Timer.scheduledTimer(withTimeInterval: Self.heartbeatInterval, repeats: true) { _ in
+            Task { @MainActor [weak self] in self?.republish() }
+        }
+        RunLoop.main.add(timer, forMode: .common)
+        heartbeat = timer
+    }
+
+    /// O iOS avisa a cada degrau de bateria; é o que faz o número mexer na hora
+    /// enquanto o aparelho carrega, sem esperar o batimento.
+    private func observeBattery() {
+        NotificationCenter.default.addObserver(
+            forName: UIDevice.batteryLevelDidChangeNotification, object: nil, queue: .main
+        ) { _ in
+            Task { @MainActor [weak self] in self?.republish() }
+        }
+        NotificationCenter.default.addObserver(
+            forName: UIDevice.batteryStateDidChangeNotification, object: nil, queue: .main
+        ) { _ in
+            Task { @MainActor [weak self] in self?.republish() }
+        }
     }
 }

@@ -281,6 +281,34 @@ final class AppModel {
         Set(store.alerts.filter { $0.isActive && $0.kind == .sos }.map(\.senderID))
     }
 
+    /// Alarme de pânico em aberto, se houver.
+    ///
+    /// Existe porque "Dispensar" na tela cheia só fechava a tela: o alarme
+    /// continuava ativo no banco, o pin vermelho e a tela de bloqueio junto, e
+    /// não sobrava nenhum caminho para cancelar. Ficava vermelho para sempre.
+    var activeSOS: FamilyAlert? {
+        store.alerts.first { $0.isActive && $0.kind == .sos }
+    }
+
+    /// O alarme em aberto é meu?
+    var activeSOSIsMine: Bool {
+        activeSOS.map { $0.senderID == store.selfMember?.id } ?? false
+    }
+
+    /// Encerra o alarme em aberto, tenha ele sido aberto por quem for.
+    func cancelActiveSOS() {
+        guard let alert = activeSOS else { return }
+        alertCenter.clear(alertID: alert.id)
+        presentedAlert = nil
+        Task { await store.resolveAlert(id: alert.id) }
+    }
+
+    /// Reabre a tela cheia de um alarme que foi dispensado.
+    func reopenActiveSOS() {
+        guard let alert = activeSOS else { return }
+        presentedAlert = alert
+    }
+
     /// Marca/desmarca alguém para aparecer na tela de bloqueio.
     func togglePin(_ member: FamilyMember) {
         let willPin = !isPinned(member)

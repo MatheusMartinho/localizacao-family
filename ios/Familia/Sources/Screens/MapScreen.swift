@@ -151,6 +151,7 @@ struct MapScreen: View {
                     settingsButton
                 }
                 statusPill
+                sosBanner
                 permissionBanner
                 farAwayBanner
             }
@@ -253,6 +254,54 @@ struct MapScreen: View {
                 center: coordinate,
                 span: MKCoordinateSpan(latitudeDelta: span, longitudeDelta: span)
             ))
+        }
+    }
+
+    // MARK: - Alarme em aberto
+
+    /// Enquanto existir um alarme de pânico ativo, esta faixa fica no mapa —
+    /// inclusive depois de a tela cheia ser dispensada. Sem ela, dispensar era
+    /// um caminho sem volta: o alarme seguia ativo e vermelho, e não havia mais
+    /// nenhum lugar no app para encerrá-lo.
+    @ViewBuilder
+    private var sosBanner: some View {
+        if let sos = model.activeSOS {
+            HStack(spacing: 10) {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.system(size: 15, weight: .bold))
+                    .foregroundStyle(.white)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(model.activeSOSIsMine
+                         ? "Seu alarme está ativo"
+                         : "\(sos.senderName) pediu ajuda")
+                        .font(.footnote.weight(.bold))
+                        .foregroundStyle(.white)
+                    Text("Disparado \(FamilyMember.relative(since: sos.createdAt))")
+                        .font(.caption2)
+                        .foregroundStyle(.white.opacity(0.8))
+                }
+                Spacer(minLength: 6)
+                if !model.activeSOSIsMine {
+                    Button("Ver") { model.reopenActiveSOS() }
+                        .font(.caption.weight(.bold))
+                        .buttonStyle(.bordered)
+                        .tint(.white)
+                        .foregroundStyle(.white)
+                }
+                Button(model.activeSOSIsMine ? "Cancelar" : "Encerrar") {
+                    model.cancelActiveSOS()
+                }
+                .font(.caption.weight(.bold))
+                .buttonStyle(.borderedProminent)
+                .tint(.white)
+                .foregroundStyle(Color.dangerRed)
+            }
+            .padding(.leading, 14)
+            .padding(.trailing, 8)
+            .padding(.vertical, 8)
+            .background(Color.dangerRed, in: .capsule)
+            .shadow(color: Color.dangerRed.opacity(0.5), radius: 10, y: 3)
+            .transition(.move(edge: .top).combined(with: .opacity))
         }
     }
 
